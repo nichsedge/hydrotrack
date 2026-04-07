@@ -21,8 +21,11 @@ class SettingsViewModel(
         SharingStarted.WhileSubscribed(5_000),
         UserSettings(
             goalMl = 2000,
+            glassSizeMl = 200,
+            quickAdds = listOf(200),
             reminderIntervalHours = 2,
             remindersEnabled = true,
+            trackerEnabled = true,
             useOunces = false,
         ),
     )
@@ -30,6 +33,12 @@ class SettingsViewModel(
     fun setGoalMl(goalMl: Int) {
         viewModelScope.launch {
             settingsStore.setGoalMl(goalMl)
+        }
+    }
+
+    fun setGlassSizeMl(glassSizeMl: Int) {
+        viewModelScope.launch {
+            settingsStore.setGlassSizeMl(glassSizeMl)
         }
     }
 
@@ -42,6 +51,12 @@ class SettingsViewModel(
     fun setRemindersEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsStore.setRemindersEnabled(enabled)
+        }
+    }
+
+    fun setTrackerEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsStore.setTrackerEnabled(enabled)
         }
     }
 

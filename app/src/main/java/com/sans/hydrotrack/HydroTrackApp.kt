@@ -3,9 +3,11 @@ package com.sans.hydrotrack
 import android.app.Application
 import com.sans.hydrotrack.core.AppContainer
 import com.sans.hydrotrack.reminders.NotificationHelper
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class HydroTrackApp : Application() {
@@ -17,11 +19,33 @@ class HydroTrackApp : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this, appScope)
-        NotificationHelper.createChannel(this)
+        NotificationHelper.createChannels(this)
+
+        // Handle settings changes (Reminders)
         appScope.launch {
             container.settingsStore.settingsFlow.collect { settings ->
                 container.reminderScheduler.applySettings(settings)
             }
+        }
+
+        // Handle tracker updates
+        appScope.launch {
+            combine(
+                container.settingsStore.settingsFlow,
+                container.hydrationRepository.dayTotal(LocalDate.now())
+            ) { settings, currentTotal ->
+                if (settings.trackerEnabled) {
+                    NotificationHelper.updateTrackerNotification(
+                        context = this@HydroTrackApp,
+                        currentMl = currentTotal,
+                        goalMl = settings.goalMl,
+                        glassSizeMl = settings.glassSizeMl,
+                        useOunces = settings.useOunces
+                    )
+                } else {
+                    NotificationHelper.cancelTrackerNotification(this@HydroTrackApp)
+                }
+            }.collect {}
         }
     }
 }

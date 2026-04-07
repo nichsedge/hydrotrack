@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 state = state,
                                 onQuickAdd = homeViewModel::addQuick,
+                                onRemoveQuickAdd = homeViewModel::removeQuickAdd,
                                 onCustomAdd = homeViewModel::addCustom,
                                 onDelete = homeViewModel::delete,
                                 modifier = Modifier.padding(innerPadding),
@@ -89,13 +90,17 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 state = SettingsUiState(
                                     goalMl = settings.goalMl,
+                                    glassSizeMl = settings.glassSizeMl,
                                     reminderIntervalHours = settings.reminderIntervalHours,
                                     remindersEnabled = settings.remindersEnabled,
+                                    trackerEnabled = settings.trackerEnabled,
                                     useOunces = settings.useOunces,
                                 ),
                                 onGoalChange = settingsViewModel::setGoalMl,
+                                onGlassSizeChange = settingsViewModel::setGlassSizeMl,
                                 onIntervalChange = settingsViewModel::setReminderIntervalHours,
                                 onRemindersEnabled = settingsViewModel::setRemindersEnabled,
+                                onTrackerEnabled = settingsViewModel::setTrackerEnabled,
                                 onUseOunces = settingsViewModel::setUseOunces,
                                 modifier = Modifier.padding(innerPadding),
                             )

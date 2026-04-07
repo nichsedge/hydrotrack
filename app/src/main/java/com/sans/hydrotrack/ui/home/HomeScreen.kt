@@ -1,7 +1,9 @@
 package com.sans.hydrotrack.ui.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +36,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,16 +57,44 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     state: HomeUiState,
     onQuickAdd: (Int) -> Unit,
+    onRemoveQuickAdd: (Int) -> Unit,
     onCustomAdd: (Int) -> Unit,
     onDelete: (WaterEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var customInput by remember { mutableStateOf("") }
+    var quickAddToDelete by remember { mutableStateOf<Int?>(null) }
     val unitLabel = if (state.useOunces) "oz" else "ml"
+
+    if (quickAddToDelete != null) {
+        val amount = quickAddToDelete!!
+        val amountDisplay = if (state.useOunces) UnitUtils.mlToOunces(amount).toInt() else amount
+        AlertDialog(
+            onDismissRequest = { quickAddToDelete = null },
+            title = { Text("Delete Quick Add") },
+            text = { Text("Are you sure you want to remove $amountDisplay $unitLabel from your quick adds?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onRemoveQuickAdd(amount)
+                        quickAddToDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { quickAddToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     LazyColumn(
         modifier = modifier
@@ -78,7 +110,7 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        
+
         item {
             ProgressCard(
                 totalMl = state.totalMl,
@@ -96,17 +128,23 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        
+
         item {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                listOf(250, 500, 750).forEach { amount ->
+                state.quickAdds.forEach { amountMl ->
+                    val amountDisplay = if (state.useOunces) UnitUtils.mlToOunces(amountMl).toInt() else amountMl
                     QuickAddButton(
-                        amount = amount,
-                        unit = "ml",
-                        onClick = { onQuickAdd(amount) },
+                        amount = amountDisplay,
+                        unit = unitLabel,
+                        onClick = { onQuickAdd(amountMl) },
+                        onLongClick = {
+                            if (state.quickAdds.size > 1) {
+                                quickAddToDelete = amountMl
+                            }
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -307,16 +345,21 @@ private fun ProgressCard(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun QuickAddButton(
     amount: Int,
     unit: String,
     onClick: () -> Unit,
+    onLongClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(24.dp),
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick
+        )
     ) {
         Column(
             modifier = Modifier

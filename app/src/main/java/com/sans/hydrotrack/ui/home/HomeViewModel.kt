@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 data class HomeUiState(
     val totalMl: Int = 0,
     val goalMl: Int = 2000,
+    val quickAdds: List<Int> = listOf(200),
     val progress: Float = 0f,
     val entries: List<WaterEntry> = emptyList(),
     val useOunces: Boolean = false,
@@ -26,7 +27,7 @@ data class HomeUiState(
 
 class HomeViewModel(
     private val repository: HydrationRepository,
-    settingsStore: SettingsStore,
+    private val settingsStore: SettingsStore,
 ) : ViewModel() {
     private val today = LocalDate.now()
     private val entriesFlow = repository.dayEntries(today)
@@ -43,6 +44,7 @@ class HomeViewModel(
         HomeUiState(
             totalMl = total,
             goalMl = goal,
+            quickAdds = settings.quickAdds,
             progress = progress.coerceIn(0f, 1f),
             entries = entries,
             useOunces = settings.useOunces,
@@ -64,6 +66,13 @@ class HomeViewModel(
         if (amountMl <= 0) return
         viewModelScope.launch {
             repository.addEntry(amountMl, source = "custom")
+            settingsStore.addQuickAddAmount(amountMl)
+        }
+    }
+
+    fun removeQuickAdd(amountMl: Int) {
+        viewModelScope.launch {
+            settingsStore.removeQuickAddAmount(amountMl)
         }
     }
 

@@ -27,8 +27,10 @@ import com.sans.hydrotrack.util.UnitUtils
 fun SettingsScreen(
     state: SettingsUiState,
     onGoalChange: (Int) -> Unit,
+    onGlassSizeChange: (Int) -> Unit,
     onIntervalChange: (Int) -> Unit,
     onRemindersEnabled: (Boolean) -> Unit,
+    onTrackerEnabled: (Boolean) -> Unit,
     onUseOunces: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -37,7 +39,13 @@ fun SettingsScreen(
     } else {
         state.goalMl
     }
+    val glassDisplay = if (state.useOunces) {
+        UnitUtils.mlToOunces(state.glassSizeMl).toInt()
+    } else {
+        state.glassSizeMl
+    }
     var goalInput by remember(goalDisplay) { mutableStateOf(goalDisplay.toString()) }
+    var glassInput by remember(glassDisplay) { mutableStateOf(glassDisplay.toString()) }
     var intervalInput by remember(state.reminderIntervalHours) {
         mutableStateOf(state.reminderIntervalHours.toString())
     }
@@ -59,6 +67,18 @@ fun SettingsScreen(
             Switch(
                 checked = state.useOunces,
                 onCheckedChange = onUseOunces,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = "Always-on progress notification")
+            Switch(
+                checked = state.trackerEnabled,
+                onCheckedChange = onTrackerEnabled,
             )
         }
 
@@ -95,6 +115,26 @@ fun SettingsScreen(
         )
 
         OutlinedTextField(
+            value = glassInput,
+            onValueChange = {
+                glassInput = it.filter(Char::isDigit)
+                glassInput.toIntOrNull()?.let { value ->
+                    if (value > 0) {
+                        val mlValue = if (state.useOunces) {
+                            UnitUtils.ouncesToMl(value.toFloat())
+                        } else {
+                            value
+                        }
+                        onGlassSizeChange(mlValue)
+                    }
+                }
+            },
+            label = { Text(text = if (state.useOunces) "Glass size (oz)" else "Glass size (ml)") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        OutlinedTextField(
             value = intervalInput,
             onValueChange = {
                 intervalInput = it.filter(Char::isDigit)
@@ -115,7 +155,9 @@ fun SettingsScreen(
 
 data class SettingsUiState(
     val goalMl: Int,
+    val glassSizeMl: Int,
     val reminderIntervalHours: Int,
     val remindersEnabled: Boolean,
+    val trackerEnabled: Boolean,
     val useOunces: Boolean,
 )
