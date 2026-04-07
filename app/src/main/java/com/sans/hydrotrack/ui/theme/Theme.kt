@@ -9,28 +9,41 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = WaterBlueDark,
+    secondary = WaterTealDark,
+    tertiary = WaterAccent,
+    primaryContainer = WaterBlueDark.copy(alpha = 0.2f),
+    onPrimaryContainer = WaterOnSurfaceDark,
+    secondaryContainer = WaterTealDark.copy(alpha = 0.2f),
+    onSecondaryContainer = WaterOnSurfaceDark,
+    background = WaterSurfaceDark,
+    surface = WaterSurfaceDark,
+    onPrimary = WaterOnSurfaceDark,
+    onSecondary = WaterOnSurfaceDark,
+    onTertiary = WaterOnSurfaceDark,
+    onBackground = WaterOnSurfaceDark,
+    onSurface = WaterOnSurfaceDark,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = WaterBlueLight,
+    secondary = WaterTealLight,
+    tertiary = WaterAccent,
+    primaryContainer = WaterSecondary,
+    onPrimaryContainer = WaterOnSurfaceLight,
+    secondaryContainer = WaterSurfaceLight,
+    onSecondaryContainer = WaterOnSurfaceLight,
+    background = WaterSurfaceLight,
+    surface = WaterSurfaceLight,
     onPrimary = Color.White,
     onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onTertiary = WaterOnSurfaceLight,
+    onBackground = WaterOnSurfaceLight,
+    onSurface = WaterOnSurfaceLight,
 )
 
 @Composable
