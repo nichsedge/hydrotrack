@@ -53,10 +53,14 @@ fun SettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 20.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(text = "Settings")
+        Text(
+            text = "Settings",
+            style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -96,6 +100,7 @@ fun SettingsScreen(
 
         OutlinedTextField(
             value = goalInput,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             onValueChange = {
                 goalInput = it.filter(Char::isDigit)
                 goalInput.toIntOrNull()?.let { value ->
@@ -116,6 +121,7 @@ fun SettingsScreen(
 
         OutlinedTextField(
             value = glassInput,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             onValueChange = {
                 glassInput = it.filter(Char::isDigit)
                 glassInput.toIntOrNull()?.let { value ->
@@ -136,6 +142,7 @@ fun SettingsScreen(
 
         OutlinedTextField(
             value = intervalInput,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             onValueChange = {
                 intervalInput = it.filter(Char::isDigit)
                 intervalInput.toIntOrNull()?.let { value ->
@@ -149,7 +156,11 @@ fun SettingsScreen(
         )
 
         Spacer(Modifier.height(8.dp))
-        Text(text = "Changes save automatically.")
+        Text(
+            text = "Changes save automatically.",
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
