@@ -12,7 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +65,16 @@ class MainActivity : ComponentActivity() {
                                     selected = tab == selectedTab,
                                     onClick = { selectedTab = tab },
                                     label = { Text(text = tab.title) },
-                                    icon = {},
+                                    icon = {
+                                        Icon(
+                                            imageVector = when (tab) {
+                                                AppTab.HOME -> Icons.Default.Home
+                                                AppTab.HISTORY -> Icons.AutoMirrored.Filled.List
+                                                AppTab.SETTINGS -> Icons.Default.Settings
+                                            },
+                                            contentDescription = tab.title
+                                        )
+                                    },
                                 )
                             }
                         }
