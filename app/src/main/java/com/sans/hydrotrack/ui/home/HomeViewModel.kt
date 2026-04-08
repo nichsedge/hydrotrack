@@ -13,8 +13,12 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 
 data class HomeUiState(
     val totalMl: Int = 0,
@@ -29,26 +33,31 @@ class HomeViewModel(
     private val repository: HydrationRepository,
     private val settingsStore: SettingsStore,
 ) : ViewModel() {
-    private val today = LocalDate.now()
-    private val entriesFlow = repository.dayEntries(today)
-    private val totalFlow = repository.dayTotal(today)
-    private val settingsFlow = settingsStore.settingsFlow
+    private val dateFlow = flow {
+        while (true) {
+            emit(LocalDate.now())
+            delay(TimeUnit.MINUTES.toMillis(1)) // Check every minute
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LocalDate.now())
 
-    val uiState: StateFlow<HomeUiState> = combine(
-        entriesFlow,
-        totalFlow,
-        settingsFlow,
-    ) { entries, total, settings ->
-        val goal = settings.goalMl
-        val progress = if (goal > 0) total.toFloat() / goal.toFloat() else 0f
-        HomeUiState(
-            totalMl = total,
-            goalMl = goal,
-            quickAdds = settings.quickAdds,
-            progress = progress.coerceIn(0f, 1f),
-            entries = entries,
-            useOunces = settings.useOunces,
-        )
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<HomeUiState> = dateFlow.flatMapLatest { date ->
+        combine(
+            repository.dayEntries(date),
+            repository.dayTotal(date),
+            settingsStore.settingsFlow,
+        ) { entries, total, settings ->
+            val goal = settings.goalMl
+            val progress = if (goal > 0) total.toFloat() / goal.toFloat() else 0f
+            HomeUiState(
+                totalMl = total,
+                goalMl = goal,
+                quickAdds = settings.quickAdds,
+                progress = progress.coerceIn(0f, 1f),
+                entries = entries,
+                useOunces = settings.useOunces,
+            )
+        }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),

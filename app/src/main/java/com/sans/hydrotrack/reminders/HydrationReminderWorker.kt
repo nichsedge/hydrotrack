@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.ListenableWorker.Result
 import com.sans.hydrotrack.HydroTrackApp
+import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 
 class HydrationReminderWorker(
@@ -14,6 +15,11 @@ class HydrationReminderWorker(
     override suspend fun doWork(): Result {
         val app = applicationContext as HydroTrackApp
         val settings = app.container.settingsStore.settingsFlow.first()
+        val currentTotal = app.container.hydrationRepository.dayTotal(LocalDate.now()).first()
+        
+        if (currentTotal >= settings.goalMl) {
+            return Result.success()
+        }
         
         NotificationHelper.showHydrationReminder(
             applicationContext,

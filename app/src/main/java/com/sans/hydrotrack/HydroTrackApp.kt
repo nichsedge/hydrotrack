@@ -8,7 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
 
 class HydroTrackApp : Application() {
     lateinit var container: AppContainer
@@ -30,20 +34,30 @@ class HydroTrackApp : Application() {
 
         // Handle tracker updates
         appScope.launch {
-            combine(
-                container.settingsStore.settingsFlow,
-                container.hydrationRepository.dayTotal(LocalDate.now())
-            ) { settings, currentTotal ->
-                if (settings.trackerEnabled) {
-                    NotificationHelper.updateTrackerNotification(
-                        context = this@HydroTrackApp,
-                        currentMl = currentTotal,
-                        goalMl = settings.goalMl,
-                        glassSizeMl = settings.glassSizeMl,
-                        useOunces = settings.useOunces
-                    )
-                } else {
-                    NotificationHelper.cancelTrackerNotification(this@HydroTrackApp)
+            val dateFlow = flow {
+                while (true) {
+                    emit(LocalDate.now())
+                    delay(TimeUnit.MINUTES.toMillis(1))
+                }
+            }
+
+            @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+            dateFlow.flatMapLatest { date ->
+                combine(
+                    container.settingsStore.settingsFlow,
+                    container.hydrationRepository.dayTotal(date)
+                ) { settings, currentTotal ->
+                    if (settings.trackerEnabled) {
+                        NotificationHelper.updateTrackerNotification(
+                            context = this@HydroTrackApp,
+                            currentMl = currentTotal,
+                            goalMl = settings.goalMl,
+                            glassSizeMl = settings.glassSizeMl,
+                            useOunces = settings.useOunces
+                        )
+                    } else {
+                        NotificationHelper.cancelTrackerNotification(this@HydroTrackApp)
+                    }
                 }
             }.collect {}
         }

@@ -15,7 +15,11 @@ import java.time.ZoneId
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
+import java.util.concurrent.TimeUnit
 
 data class DaySummary(
     val date: LocalDate,
@@ -33,33 +37,39 @@ class HistoryViewModel(
     settingsStore: SettingsStore,
     private val zoneId: ZoneId = ZoneId.systemDefault(),
 ) : ViewModel() {
-    private val endDate = LocalDate.now()
-    private val startDate = endDate.minusDays(6)
-
-    private val historyFlow = repository.history(startDate, endDate)
-
-    val uiState: StateFlow<HistoryUiState> = combine(
-        historyFlow,
-        settingsStore.settingsFlow,
-    ) { entries, settings ->
-        val grouped = entries.groupBy { entry ->
-            Instant.ofEpochMilli(entry.timestamp).atZone(zoneId).toLocalDate()
+    private val dateFlow = flow {
+        while (true) {
+            emit(LocalDate.now())
+            delay(TimeUnit.MINUTES.toMillis(1))
         }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LocalDate.now())
 
-        val summaries = (0L..6L).map { offset ->
-            val date = endDate.minusDays(offset)
-            val dayEntries = grouped[date].orEmpty()
-            DaySummary(
-                date = date,
-                totalMl = dayEntries.sumOf { it.amountMl },
-                entries = dayEntries,
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<HistoryUiState> = dateFlow.flatMapLatest { endDate ->
+        val startDate = endDate.minusDays(6)
+        combine(
+            repository.history(startDate, endDate),
+            settingsStore.settingsFlow,
+        ) { entries, settings ->
+            val grouped = entries.groupBy { entry ->
+                Instant.ofEpochMilli(entry.timestamp).atZone(zoneId).toLocalDate()
+            }
+
+            val summaries = (0L..6L).map { offset ->
+                val date = endDate.minusDays(offset)
+                val dayEntries = grouped[date].orEmpty()
+                DaySummary(
+                    date = date,
+                    totalMl = dayEntries.sumOf { it.amountMl },
+                    entries = dayEntries,
+                )
+            }
+
+            HistoryUiState(
+                summaries = summaries,
+                useOunces = settings.useOunces,
             )
         }
-
-        HistoryUiState(
-            summaries = summaries,
-            useOunces = settings.useOunces,
-        )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
