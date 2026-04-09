@@ -9,16 +9,16 @@ import com.sans.hydrotrack.core.AppContainer
 import com.sans.hydrotrack.data.HydrationRepository
 import com.sans.hydrotrack.data.WaterEntry
 import com.sans.hydrotrack.settings.SettingsStore
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 data class DaySummary(

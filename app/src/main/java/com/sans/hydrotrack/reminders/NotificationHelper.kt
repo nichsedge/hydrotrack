@@ -24,7 +24,7 @@ object NotificationHelper {
 
     fun createChannels(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        
+
         // Reminder Channel (Default importance)
         val reminderChannel = NotificationChannel(
             REMINDER_CHANNEL_ID,
@@ -120,7 +120,11 @@ object NotificationHelper {
         }
     }
 
-    private fun createActionPendingIntent(context: Context, amountMl: Int, notificationId: Int): PendingIntent {
+    private fun createActionPendingIntent(
+        context: Context,
+        amountMl: Int,
+        notificationId: Int
+    ): PendingIntent {
         val actionIntent = Intent(context, NotificationActionReceiver::class.java).apply {
             putExtra(EXTRA_AMOUNT_ML, amountMl)
             putExtra(EXTRA_NOTIFICATION_ID, notificationId)

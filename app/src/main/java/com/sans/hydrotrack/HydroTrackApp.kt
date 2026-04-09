@@ -3,16 +3,16 @@ package com.sans.hydrotrack
 import android.app.Application
 import com.sans.hydrotrack.core.AppContainer
 import com.sans.hydrotrack.reminders.NotificationHelper
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.delay
 
 class HydroTrackApp : Application() {
     lateinit var container: AppContainer

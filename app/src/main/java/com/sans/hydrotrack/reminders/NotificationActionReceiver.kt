@@ -19,7 +19,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             val pendingResult = goAsync()
             val app = context.applicationContext as HydroTrackApp
             val repository = app.container.hydrationRepository
-            
+
             // Use a background dispatcher for DB operations
             CoroutineScope(Dispatchers.IO).launch {
                 try {

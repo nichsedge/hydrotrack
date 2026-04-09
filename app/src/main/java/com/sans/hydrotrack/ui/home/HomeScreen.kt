@@ -2,7 +2,6 @@ package com.sans.hydrotrack.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -135,7 +133,8 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 state.quickAdds.forEach { amountMl ->
-                    val amountDisplay = if (state.useOunces) UnitUtils.mlToOunces(amountMl).toInt() else amountMl
+                    val amountDisplay =
+                        if (state.useOunces) UnitUtils.mlToOunces(amountMl).toInt() else amountMl
                     QuickAddButton(
                         amount = amountDisplay,
                         unit = unitLabel,
@@ -159,7 +158,7 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        
+
         item {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -177,7 +176,8 @@ fun HomeScreen(
                 Button(
                     onClick = {
                         val amount = customInput.toIntOrNull() ?: 0
-                        val mlAmount = if (state.useOunces) UnitUtils.ouncesToMl(amount.toFloat()) else amount
+                        val mlAmount =
+                            if (state.useOunces) UnitUtils.ouncesToMl(amount.toFloat()) else amount
                         if (mlAmount > 0) {
                             onCustomAdd(mlAmount)
                             customInput = ""
@@ -411,8 +411,9 @@ private fun EntryList(
     ) {
         items(entries, key = { it.id }) { entry ->
             val time = Instant.ofEpochMilli(entry.timestamp).atZone(zoneId).toLocalTime()
-            val amount = if (useOunces) UnitUtils.mlToOunces(entry.amountMl).toInt() else entry.amountMl
-            
+            val amount =
+                if (useOunces) UnitUtils.mlToOunces(entry.amountMl).toInt() else entry.amountMl
+
             ElevatedCard(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()

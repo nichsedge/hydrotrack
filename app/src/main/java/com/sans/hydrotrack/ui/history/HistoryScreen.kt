@@ -51,14 +51,14 @@ fun HistoryScreen(
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
-        
+
         Spacer(Modifier.height(8.dp))
         Text(
             text = "Your hydration over the last 7 days",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(Modifier.height(24.dp))
 
         if (state.summaries.isEmpty()) {
@@ -77,8 +77,12 @@ fun HistoryScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(state.summaries, key = { it.date.toString() }) { summary ->
-                val totalDisplay = if (state.useOunces) UnitUtils.mlToOunces(summary.totalMl).toInt() else summary.totalMl
-                val progress = (summary.totalMl.toFloat() / 2000f).coerceIn(0f, 1f) // Assuming 2000ml goal for history view for now
+                val totalDisplay = if (state.useOunces) UnitUtils.mlToOunces(summary.totalMl)
+                    .toInt() else summary.totalMl
+                val progress = (summary.totalMl.toFloat() / 2000f).coerceIn(
+                    0f,
+                    1f
+                ) // Assuming 2000ml goal for history view for now
 
                 ElevatedCard(
                     shape = RoundedCornerShape(24.dp),
@@ -113,9 +117,11 @@ fun HistoryScreen(
                             Spacer(Modifier.height(16.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             Spacer(Modifier.height(16.dp))
-                            
+
                             summary.entries.forEachIndexed { index, entry ->
-                                val amount = if (state.useOunces) UnitUtils.mlToOunces(entry.amountMl).toInt() else entry.amountMl
+                                val amount =
+                                    if (state.useOunces) UnitUtils.mlToOunces(entry.amountMl)
+                                        .toInt() else entry.amountMl
                                 Row(
                                     modifier = Modifier.padding(vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically

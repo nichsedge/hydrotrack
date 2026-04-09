@@ -1,7 +1,7 @@
 package com.sans.hydrotrack.data
 
-import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 interface HydrationRepository {
     suspend fun addEntry(amountMl: Int, source: String? = null)

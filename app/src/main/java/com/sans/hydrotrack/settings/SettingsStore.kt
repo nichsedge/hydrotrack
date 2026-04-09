@@ -68,7 +68,7 @@ class SettingsStore(context: Context) {
                 .filter { it.isNotEmpty() }
                 .map { it.toInt() }
                 .toMutableList()
-            
+
             if (!current.contains(amountMl)) {
                 current.add(amountMl)
                 val updated = current.distinct().sorted()
@@ -84,7 +84,7 @@ class SettingsStore(context: Context) {
                 .filter { it.isNotEmpty() }
                 .map { it.toInt() }
                 .toMutableList()
-            
+
             if (current.size > 1) {
                 current.removeIf { it == amountMl }
                 val updated = current.distinct().sorted()
