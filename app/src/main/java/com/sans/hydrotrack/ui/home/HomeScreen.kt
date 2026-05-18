@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -116,6 +117,28 @@ fun HomeScreen(
                 progress = state.progress,
                 useOunces = state.useOunces,
             )
+        }
+
+        item {
+            val glassDisplay = if (state.useOunces) UnitUtils.mlToOunces(state.glassSizeMl).toInt() else state.glassSizeMl
+            Button(
+                onClick = { onQuickAdd(state.glassSizeMl) },
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            ) {
+                Text(
+                    text = "💧 Drink 1 Glass ($glassDisplay $unitLabel)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         item {
@@ -339,7 +362,8 @@ private fun ProgressCard(
             WaterProgressIndicator(
                 progress = progress,
                 size = 100.dp,
-                strokeWidth = 10.dp
+                strokeWidth = 10.dp,
+                textColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }

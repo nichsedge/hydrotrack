@@ -79,10 +79,10 @@ fun HistoryScreen(
             items(state.summaries, key = { it.date.toString() }) { summary ->
                 val totalDisplay = if (state.useOunces) UnitUtils.mlToOunces(summary.totalMl)
                     .toInt() else summary.totalMl
-                val progress = (summary.totalMl.toFloat() / 2000f).coerceIn(
+                val progress = (summary.totalMl.toFloat() / state.goalMl.toFloat()).coerceIn(
                     0f,
                     1f
-                ) // Assuming 2000ml goal for history view for now
+                )
 
                 ElevatedCard(
                     shape = RoundedCornerShape(24.dp),
@@ -109,7 +109,8 @@ fun HistoryScreen(
                             WaterProgressIndicator(
                                 progress = progress,
                                 size = 48.dp,
-                                strokeWidth = 5.dp
+                                strokeWidth = 5.dp,
+                                textColor = MaterialTheme.colorScheme.primary
                             )
                         }
 

@@ -30,6 +30,7 @@ data class DaySummary(
 data class HistoryUiState(
     val summaries: List<DaySummary> = emptyList(),
     val useOunces: Boolean = false,
+    val goalMl: Int = 2000,
 )
 
 class HistoryViewModel(
@@ -68,6 +69,7 @@ class HistoryViewModel(
             HistoryUiState(
                 summaries = summaries,
                 useOunces = settings.useOunces,
+                goalMl = settings.goalMl,
             )
         }
     }.stateIn(
